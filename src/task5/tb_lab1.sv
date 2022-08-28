@@ -1,0 +1,63 @@
+module tb_lab1();
+//THIS IS THE FINAL COMMIT
+
+reg CLOCK_50;
+reg [3:0] KEY;
+wire [9:0] LEDR;
+wire [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5;
+
+lab1 dut(CLOCK_50, KEY, LEDR,
+        HEX5, HEX4, HEX3,
+        HEX2, HEX1, HEX0);
+
+
+initial begin
+    KEY[0] = 1'b0; #50;
+forever begin
+    KEY[0] = 1'b1; #50;
+    KEY[0] = 1'b0; #50;
+end
+end
+
+initial begin
+    CLOCK_50 = 1'b0; #10;
+forever begin
+    CLOCK_50 = 1'b1; #10;
+    CLOCK_50 = 1'b0; #10;
+end
+end
+
+initial begin
+KEY[3] = 0;
+#100;
+//ASSERT THAT NO HEX/LED DISPLAYS LIGHT UP BECAUSE OF RESET
+assert({HEX0, HEX1, HEX2, HEX3, HEX4, HEX5} == {7'b1111111, 7'b1111111, 7'b1111111, 7'b1111111, 7'b1111111, 7'b1111111});
+assert(LEDR == 10'b0000000000);
+
+KEY[3] = 1;
+//ASSERT THAT HEX0(PCARD1) LIGHTS UP
+#100;
+assert({HEX1, HEX2, HEX3, HEX4, HEX5} == {7'b1111111, 7'b1111111, 7'b1111111, 7'b1111111, 7'b1111111});
+
+//ASSERTS THAT HEX3(DCARD1) LIGHTS UP
+#100;
+assert({HEX1, HEX2, HEX4, HEX5} == {7'b1111111, 7'b1111111, 7'b1111111, 7'b1111111});
+
+//ASSERTS THAT HEX1(PCARD2) LIGHTS UP 
+#100;
+assert({HEX2, HEX4, HEX5} == {7'b1111111, 7'b1111111, 7'b1111111});
+
+//ASSERTS THAT HEX4(DCARD2) LIGHTS UP
+#50;
+assert({HEX2, HEX5} == {7'b1111111, 7'b1111111});
+
+//BACK TO RESET
+KEY[3] = 0;
+#100;
+assert({HEX0, HEX1, HEX2, HEX3, HEX4, HEX5} == {7'b1111111, 7'b1111111, 7'b1111111, 7'b1111111, 7'b1111111, 7'b1111111});
+
+$stop;
+
+end
+endmodule
+
